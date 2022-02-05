@@ -1,0 +1,2126 @@
+openapi: 3.0.0
+servers:
+    # Added by API Auto Mocking Plugin
+    - description: SwaggerHub API Auto Mocking
+      url: https://virtserver.swaggerhub.com/JacobLinCool/UniCourse/1.0.0
+info:
+    description: UniCourse API
+    version: "1.0.0"
+    title: UniCourse API
+    contact:
+        email: jacoblincool@gmail.com
+tags:
+    - name: auth
+      description: Auth API
+    - name: account
+      description: Account API
+    - name: profile
+      description: Profile API
+    - name: course
+      description: Course API
+    - name: forum
+      description: Forum API
+security:
+    - bearer: []
+paths:
+    /auth/login:
+        post:
+            tags:
+                - auth
+            security: []
+            summary: 登入
+            operationId: AuthLogin
+            description: |
+                登入
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/LoginPayload"
+            responses:
+                "200":
+                    description: Always 200
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AuthResponse"
+
+    /auth/register:
+        post:
+            tags:
+                - auth
+            security: []
+            summary: 註冊
+            operationId: AuthRegister
+            description: |
+                註冊
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/RegisterPayload"
+            responses:
+                "200":
+                    description: Always 200
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/AuthResponse"
+
+    /auth/reset:
+        post:
+            tags:
+                - auth
+            security: []
+            summary: 發送重設密碼驗證信
+            operationId: AuthReset
+            description: |
+                發送重設密碼驗證信
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ResetPayload"
+            responses:
+                "200":
+                    description: Always 200
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ResetResponse"
+
+    /auth/reset_verify:
+        post:
+            tags:
+                - auth
+            security: []
+            summary: 重設密碼
+            operationId: AuthResetVerify
+            description: |
+                重設密碼
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ResetVerifyPayload"
+            responses:
+                "200":
+                    description: Always 200
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ResetVerifyResponse"
+
+    /me:
+        get:
+            tags:
+                - account
+            summary: 自己的資料
+            operationId: AccountRead
+            description: |
+                自己的資料
+            responses:
+                "200":
+                    description: Always 200
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MeResponse"
+        patch:
+            tags:
+                - account
+            summary: 更新自己的資料
+            operationId: AccountUpdate
+            description: |
+                更新自己的資料
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/MePatch"
+            responses:
+                "200":
+                    description: Always 200
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/MeResponse"
+
+    /profile/{username}:
+        get:
+            tags:
+                - profile
+            summary: 取得使用者公開資料
+            operationId: ProfileRead
+            description: |
+                取得使用者公開資料
+            parameters:
+                - in: path
+                  name: username
+                  description: 使用者 ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/ProfileResponse"
+
+    /courses:
+        get:
+            tags:
+                - course
+            summary: 搜尋符合條件的課程 Metae
+            operationId: CourseMetaRead
+            description: |
+                搜尋符合條件的課程 Metae
+            parameters:
+                - in: query
+                  name: q
+                  description: >-
+                      以空白分割多個 filter，進行 AND 查詢（OR 查詢可視情況由後端擴充）
+
+                      每個 filter 的形式為 `key:value`，或者，也可以沒有 `key` 只有 `value`
+                      做模糊搜尋（或預設搜尋標題跟科目代碼之類的？）
+
+
+                      例如：
+
+                      `程式設計 department:資工系 teacher:紀` 代表要搜尋任何包含「程式設計」且教師有「紀」的「資工系」課程
+
+
+                      建議 filters，這部分是後端可自行決定:
+
+                      - department (d) 系所 `d:資工`
+
+                      - teacher (T) 教師 `T:紀`
+
+                      - title (t) 課程名稱 `t:程式設計`
+
+                      - code (c) 科目代碼 `c:CSU0002`
+
+                      - serial (s) 開課序號 `s:2949`
+
+                      - year (y) 開課學年度 `y:110`（或者要合併學期 `110-2` 或 `1102`）
+
+                      - term (tm) 開課學期 `tm:2`
+
+                      - tag (tg) 標籤 `tg:UX`
+
+                      - program (p) 學分學程 `p:音樂科技`
+
+                      - general (g) 通識領域 `g:人文`
+
+                      - rating (r) 綜合評分 `r:>4.5` （`>` `<` `=`）
+
+                      - usefulness (uf) 實用性 `u:>4`
+
+                      - sweetness (sw) 甜度 `s:>4`
+
+                      - easiness (es) 涼度 `e:>4`
+
+                      - day (d) 週幾授課 `d:1` (考慮與節數時段合併？)
+
+                      - session (sn) 包含的節數時段 `sn:1-2` `sn:5`
+
+                      - location (l) 地點 `l:公館`
+
+                      - quota (q) 名額 `q:>10`
+
+                      - grading (gd) 評分方法 `gd:作業>49`
+
+                      - hours (h) 實際每週授課時數 `h:<3`
+
+                      - methodology (m) 教學方法包含 `m:講述法`
+
+                      - prerequisite (pr) 先修課程 `pr:程式設計（一）`
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/ComplexCourseSearchString"
+                - in: query
+                  name: limit
+                  description: Metae 上限
+                  schema:
+                      type: number
+                      default: 100
+                - in: query
+                  name: offset
+                  description: 偏移量
+                  schema:
+                      type: number
+                      minimum: 0
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CourseMetaResponse"
+
+    /courses/{key}:
+        get:
+            tags:
+                - course
+            summary: 取得課程資料
+            operationId: CourseInfoRead
+            description: |
+                取得課程資料
+            parameters:
+                - in: path
+                  name: key
+                  description: 課程定位鍵 year-term-serial
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CourseInfoResponse"
+
+    /courses/{key}/vote:
+        put:
+            tags:
+                - course
+            summary: 課程評分
+            operationId: CourseVote
+            description: |
+                課程評分
+            parameters:
+                - in: path
+                  name: key
+                  description: 課程定位鍵 year-term-serial
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CourseRating"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Response"
+
+    /courses/tags:
+        get:
+            tags:
+                - course
+            summary: 搜尋 Course Tags
+            operationId: CourseTagsRead
+            description: |
+                搜尋 Course Tags
+            parameters:
+                - in: query
+                  name: q
+                  description: 搜尋字串
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: limit
+                  description: 上限
+                  schema:
+                      type: number
+                      default: 5
+                - in: query
+                  name: offset
+                  description: 偏移量
+                  schema:
+                      type: number
+                      minimum: 0
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CourseTagsResponse"
+
+    /posts/latest:
+        get:
+            tags:
+                - forum
+            summary: 取得最新貼文
+            operationId: ForumPostsLatest
+            description: |
+                取得最新貼文
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PostsResponse"
+
+    /posts:
+        get:
+            tags:
+                - forum
+            summary: 搜尋貼文
+            operationId: ForumPostsSearch
+            description: |
+                搜尋貼文
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PostsResponse"
+            parameters:
+                - in: query
+                  name: q
+                  description: >-
+                      以空白分割多個 filter，進行 AND 查詢（OR 查詢可視情況由後端擴充）
+
+                      每個 filter 的形式為 `key:value`，或者，也可以沒有 `key` 只有 `value`
+                      做模糊搜尋（或預設搜尋標題跟科目代碼之類的？）
+
+
+                      例如：
+
+                      `考古題 date:>2021` 代表要搜尋任何包含「考古題」且在 2021 年之後的貼文
+
+
+                      建議 filters，這部分是後端可自行決定:
+
+                      - title (t) 貼文標題 `t:考古題`
+
+                      - code (c) 相關課程科目代碼 `c:CSU0002`
+
+                      - tag (tg) 標籤 `tg:考古題`
+
+                      - program (p) 學分學程 `p:音樂科技`
+
+                      - date (d) 發文時間 `d:>2021`
+
+                      - vote (v) 正向投票數 `v:>100`
+
+                      - author (a) 發文者 `a:user123`
+                  required: true
+                  schema:
+                      $ref: "#/components/schemas/ComplexPostSearchString"
+                - in: query
+                  name: limit
+                  description: 回傳數量
+                  schema:
+                      type: number
+                      default: 20
+                - in: query
+                  name: offset
+                  description: 偏移量
+                  schema:
+                      type: number
+                      minimum: 0
+        post:
+            tags:
+                - forum
+            summary: 新增貼文
+            operationId: ForumPostCreate
+            description: |
+                新增貼文
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PostPayload"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PostSuccessResponse"
+
+    /posts/tags:
+        get:
+            tags:
+                - forum
+            summary: 搜尋 Post Tags
+            operationId: PostTagsRead
+            description: |
+                搜尋 Post Tags
+            parameters:
+                - in: query
+                  name: q
+                  description: 搜尋字串
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: limit
+                  description: 上限
+                  schema:
+                      type: number
+                      default: 5
+                - in: query
+                  name: offset
+                  description: 偏移量
+                  schema:
+                      type: number
+                      minimum: 0
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CourseTagsResponse"
+
+    /posts/{post_id}:
+        get:
+            tags:
+                - forum
+            summary: 取得貼文
+            operationId: ForumPostRead
+            description: |
+                取得貼文
+            parameters:
+                - in: path
+                  name: post_id
+                  description: 貼文 ID
+                  required: true
+                  schema:
+                      type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PostResponse"
+        put:
+            tags:
+                - forum
+            summary: 編輯貼文
+            operationId: ForumPostUpdate
+            description: |
+                編輯貼文
+            parameters:
+                - in: path
+                  name: post_id
+                  description: 貼文 ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/PostPayload"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/PostSuccessResponse"
+
+    /posts/{post_id}/comments:
+        get:
+            tags:
+                - forum
+            summary: 取得貼文留言
+            operationId: ForumCommentsRead
+            description: |
+                取得貼文留言
+            parameters:
+                - in: path
+                  name: post_id
+                  description: 貼文 ID
+                  required: true
+                  schema:
+                      type: string
+                - in: query
+                  name: limit
+                  description: 留言篇數
+                  schema:
+                      type: number
+                      default: 10
+                - in: query
+                  name: offset
+                  description: 偏移量
+                  schema:
+                      type: number
+                      minimum: 0
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CommentsResponse"
+
+    /posts/{post_id}/vote:
+        put:
+            tags:
+                - forum
+            summary: 貼文評分投票
+            operationId: PostVote
+            description: |
+                貼文評分投票
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Response"
+            parameters:
+                - in: path
+                  name: post_id
+                  description: 貼文 ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                type:
+                                    type: number
+                                    description: "0: 取消 +: upvote -: downvote"
+
+    /comments/{comment_id}:
+        put:
+            tags:
+                - forum
+            summary: 編輯留言
+            operationId: ForumCommentUpdate
+            description: |
+                編輯留言
+            parameters:
+                - in: path
+                  name: comment_id
+                  description: 留言 ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CommentPayload"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CommentSuccessResponse"
+
+    /comments:
+        post:
+            tags:
+                - forum
+            summary: 新增留言
+            operationId: ForumCommentCreate
+            description: |
+                新增留言
+            parameters:
+                - in: query
+                  name: post
+                  description: 貼文 ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/CommentPayload"
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/CommentSuccessResponse"
+
+    /comments/{comment_id}/vote:
+        put:
+            tags:
+                - forum
+            summary: 留言評分投票
+            operationId: CommentVote
+            description: |
+                留言評分投票
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Response"
+            parameters:
+                - in: path
+                  name: comment_id
+                  description: 貼文 ID
+                  required: true
+                  schema:
+                      type: string
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            properties:
+                                type:
+                                    type: number
+                                    description: "0: 取消 +: upvote -: downvote"
+
+components:
+    securitySchemes:
+        bearer:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+    schemas:
+        Response:
+            properties:
+                success:
+                    title: Response.success
+                    description: 操作成功？
+                    type: boolean
+                data:
+                    title: Response.data
+                    description: 成功
+                err:
+                    properties:
+                        title:
+                            title: Response.err.title
+                            type: string
+                        message:
+                            title: Response.err.message
+                            type: string
+                    required:
+                        - title
+                        - message
+                    additionalProperties: false
+                    title: Response.err
+                    description: 失敗，錯誤資訊
+                    type: object
+                token:
+                    title: Response.token
+                    description: 如果該操作會影響使用者包含在 JWT 內的狀態，則需核發新的 JWT，或用於續簽
+                    type: string
+            required:
+                - success
+            additionalProperties: false
+            title: Response
+            description: API Response
+            type: object
+        Badge:
+            properties:
+                name:
+                    title: Badge.name
+                    type: string
+                image:
+                    title: Badge.image
+                    type: string
+            required:
+                - name
+                - image
+            additionalProperties: false
+            title: Badge
+            type: object
+        Permission:
+            properties:
+                name:
+                    title: Permission.name
+                    type: string
+                description:
+                    title: Permission.description
+                    type: string
+            required:
+                - name
+                - description
+            additionalProperties: false
+            title: Permission
+            type: object
+        JWTPayload:
+            properties:
+                user:
+                    properties:
+                        name:
+                            $ref: "#/components/schemas/Username"
+                            title: JWTPayload.user.name
+                            description: 使用者 ID
+                        email:
+                            title: JWTPayload.user.email
+                            description: 使用者 Email
+                            type: string
+                        display:
+                            title: JWTPayload.user.display
+                            description: 使用者顯示名稱
+                            type: string
+                        exp:
+                            title: JWTPayload.user.exp
+                            description: 使用者經驗值
+                            type: number
+                        perm:
+                            items:
+                                title: JWTPayload.user.perm.[]
+                                type: string
+                            title: JWTPayload.user.perm
+                            description: 使用者特殊權限 @example `["admin", "moderator"]`
+                            type: array
+                        std_id:
+                            $ref: "#/components/schemas/StdId"
+                            title: JWTPayload.user.std_id
+                            description: 使用者學校-使用者學號
+                        verified:
+                            title: JWTPayload.user.verified
+                            description: 是否通過學校驗證
+                            type: boolean
+                    required:
+                        - name
+                        - email
+                        - display
+                        - exp
+                        - perm
+                        - std_id
+                        - verified
+                    additionalProperties: false
+                    title: JWTPayload.user
+                    type: object
+                exp:
+                    title: JWTPayload.exp
+                    description: JWT 過期時戳
+                    type: number
+                iat:
+                    title: JWTPayload.iat
+                    description: JWT 簽發時戳
+                    type: number
+                id:
+                    title: JWTPayload.id
+                    description: JWT ID，隨機字串，應該是後端比較需要用？
+                    type: string
+            required:
+                - user
+                - exp
+                - iat
+                - id
+            additionalProperties: false
+            title: JWTPayload
+            type: object
+        LoginPayload:
+            properties:
+                username:
+                    title: LoginPayload.username
+                    description: 使用者 ID
+                    type: string
+                password:
+                    title: LoginPayload.password
+                    description: 使用者密碼
+                    type: string
+                recaptcha:
+                    title: LoginPayload.recaptcha
+                    description: reCAPTCHA 的那個 code
+                    type: string
+            required:
+                - username
+                - password
+                - recaptcha
+            additionalProperties: false
+            title: LoginPayload
+            type: object
+        RegisterPayload:
+            properties:
+                username:
+                    title: RegisterPayload.username
+                    description: 使用者 ID
+                    type: string
+                password:
+                    title: RegisterPayload.password
+                    description: 使用者密碼
+                    type: string
+                email:
+                    title: RegisterPayload.email
+                    description: 使用者電子郵件
+                    type: string
+                std_id:
+                    title: RegisterPayload.std_id
+                    description: 使用者學校-使用者學號 @example `001-41047000S`
+                    type: string
+                recaptcha:
+                    title: RegisterPayload.recaptcha
+                    description: reCAPTCHA 的那個 code
+                    type: string
+            required:
+                - username
+                - password
+                - email
+                - std_id
+                - recaptcha
+            additionalProperties: false
+            title: RegisterPayload
+            type: object
+        AuthResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    properties:
+                        token:
+                            title: AuthResponse.data.token
+                            description: JWT
+                            type: string
+                    required:
+                        - token
+                    additionalProperties: false
+                    title: AuthResponse.data
+                    description: 成功
+                    type: object
+            additionalProperties: false
+            title: AuthResponse
+            type: object
+        ResetPayload:
+            properties:
+                email:
+                    title: ResetPayload.email
+                    description: 使用者電子郵件
+                    type: string
+                recaptcha:
+                    title: ResetPayload.recaptcha
+                    description: reCAPTCHA 的那個 code
+                    type: string
+            required:
+                - email
+                - recaptcha
+            additionalProperties: false
+            title: ResetPayload
+            type: object
+        ResetResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    properties:
+                        email:
+                            title: ResetResponse.data.email
+                            description: 已寄送的電子郵件
+                            type: string
+                    required:
+                        - email
+                    additionalProperties: false
+                    title: ResetResponse.data
+                    description: 成功
+                    type: object
+            additionalProperties: false
+            title: ResetResponse
+            type: object
+        ResetVerifyPayload:
+            properties:
+                code:
+                    title: ResetVerifyPayload.code
+                    description: 驗證碼
+                    type: string
+                password:
+                    title: ResetVerifyPayload.password
+                    description: 新密碼
+                    type: string
+                recaptcha:
+                    title: ResetVerifyPayload.recaptcha
+                    description: reCAPTCHA 的那個 code
+                    type: string
+            required:
+                - code
+                - password
+                - recaptcha
+            additionalProperties: false
+            title: ResetVerifyPayload
+            type: object
+        ResetVerifyResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    properties:
+                        name:
+                            title: ResetVerifyResponse.data.name
+                            description: 密碼被更新者名稱
+                            type: string
+                    required:
+                        - name
+                    additionalProperties: false
+                    title: ResetVerifyResponse.data
+                    description: 成功
+                    type: object
+            additionalProperties: false
+            title: ResetVerifyResponse
+            type: object
+        Comment:
+            properties:
+                id:
+                    title: Comment.id
+                    type: number
+                user:
+                    $ref: "#/components/schemas/Username"
+                    title: Comment.user
+                content:
+                    title: Comment.content
+                    type: string
+                time:
+                    title: Comment.time
+                    type: number
+                vote:
+                    properties:
+                        up:
+                            title: Comment.vote.up
+                            type: number
+                        down:
+                            title: Comment.vote.down
+                            type: number
+                    required:
+                        - up
+                        - down
+                    additionalProperties: false
+                    title: Comment.vote
+                    type: object
+                selected:
+                    title: Comment.selected
+                    description: 最佳解
+                    type: boolean
+            required:
+                - id
+                - user
+                - content
+                - time
+                - vote
+            additionalProperties: false
+            title: Comment
+            description: 當跟隨的 Post 是 course 時，視為一般留言，當 Post 是 question 時，視為回答
+            type: object
+        CommentResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    $ref: "#/components/schemas/Comment"
+                    title: CommentResponse.data
+            additionalProperties: false
+            title: CommentResponse
+            type: object
+        CommentsResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    items:
+                        $ref: "#/components/schemas/Comment"
+                        title: CommentsResponse.data.[]
+                    title: CommentsResponse.data
+                    type: array
+            additionalProperties: false
+            title: CommentsResponse
+            type: object
+        PostMeta:
+            properties:
+                id:
+                    title: PostMeta.id
+                    type: string
+                type:
+                    enum:
+                        - review
+                        - question
+                        - others
+                    title: PostMeta.type
+                    type: string
+                author:
+                    $ref: "#/components/schemas/Username"
+                    title: PostMeta.author
+                title:
+                    title: PostMeta.title
+                    type: string
+                time:
+                    title: PostMeta.time
+                    type: number
+                vote:
+                    properties:
+                        up:
+                            title: PostMeta.vote.up
+                            type: number
+                        down:
+                            title: PostMeta.vote.down
+                            type: number
+                    required:
+                        - up
+                        - down
+                    additionalProperties: false
+                    title: PostMeta.vote
+                    type: object
+                tags:
+                    items:
+                        title: PostMeta.tags.[]
+                        type: string
+                    title: PostMeta.tags
+                    type: array
+                course:
+                    properties:
+                        year:
+                            title: PostMeta.course.year
+                            type: number
+                        term:
+                            title: PostMeta.course.term
+                            type: number
+                        serial:
+                            title: PostMeta.course.serial
+                            type: number
+                        name:
+                            title: PostMeta.course.name
+                            type: string
+                        teacher:
+                            title: PostMeta.course.teacher
+                            type: string
+                    required:
+                        - year
+                        - term
+                        - serial
+                        - name
+                        - teacher
+                    additionalProperties: false
+                    title: PostMeta.course
+                    description: 如果 type 是 course 就必須存在，question 則是非必要
+                    type: object
+            required:
+                - id
+                - type
+                - author
+                - title
+                - time
+                - vote
+                - tags
+            additionalProperties: false
+            title: PostMeta
+            type: object
+        Post:
+            properties:
+                id:
+                    title: Post.id
+                    type: string
+                type:
+                    enum:
+                        - review
+                        - question
+                        - others
+                    title: Post.type
+                    type: string
+                author:
+                    $ref: "#/components/schemas/Username"
+                    title: Post.author
+                title:
+                    title: Post.title
+                    type: string
+                content:
+                    title: Post.content
+                    type: string
+                time:
+                    title: Post.time
+                    type: number
+                vote:
+                    properties:
+                        up:
+                            title: Post.vote.up
+                            type: number
+                        down:
+                            title: Post.vote.down
+                            type: number
+                    required:
+                        - up
+                        - down
+                    additionalProperties: false
+                    title: Post.vote
+                    type: object
+                tags:
+                    items:
+                        title: Post.tags.[]
+                        type: string
+                    title: Post.tags
+                    type: array
+                course:
+                    properties:
+                        year:
+                            title: Post.course.year
+                            type: number
+                        term:
+                            title: Post.course.term
+                            type: number
+                        serial:
+                            title: Post.course.serial
+                            type: number
+                        name:
+                            title: Post.course.name
+                            type: string
+                        teacher:
+                            title: Post.course.teacher
+                            type: string
+                        rating:
+                            properties:
+                                sweetness:
+                                    title: Post.course.rating.sweetness
+                                    type: number
+                                easiness:
+                                    title: Post.course.rating.easiness
+                                    type: number
+                                usefulness:
+                                    title: Post.course.rating.usefulness
+                                    type: number
+                            required:
+                                - sweetness
+                                - easiness
+                                - usefulness
+                            additionalProperties: false
+                            title: Post.course.rating
+                            description: 如果 type 是 course 就必須存在，question 則不應存在
+                            type: object
+                    required:
+                        - year
+                        - term
+                        - serial
+                        - name
+                        - teacher
+                    additionalProperties: false
+                    title: Post.course
+                    description: 如果 type 是 course 就必須存在，question 則是非必要
+                    type: object
+            required:
+                - id
+                - type
+                - author
+                - title
+                - content
+                - time
+                - vote
+                - tags
+            additionalProperties: false
+            title: Post
+            type: object
+        CommentPayload:
+            properties:
+                content:
+                    title: CommentPayload.content
+                    description: 留言內容
+                    type: string
+            required:
+                - content
+            additionalProperties: false
+            title: CommentPayload
+            type: object
+        PostPayload:
+            properties:
+                type:
+                    enum:
+                        - review
+                        - question
+                        - others
+                    title: PostPayload.type
+                    type: string
+                title:
+                    title: PostPayload.title
+                    type: string
+                content:
+                    title: PostPayload.content
+                    type: string
+                tags:
+                    items:
+                        title: PostPayload.tags.[]
+                        type: string
+                    title: PostPayload.tags
+                    type: array
+                course:
+                    properties:
+                        year:
+                            title: PostPayload.course.year
+                            type: number
+                        term:
+                            title: PostPayload.course.term
+                            type: number
+                        serial:
+                            title: PostPayload.course.serial
+                            type: number
+                        name:
+                            title: PostPayload.course.name
+                            type: string
+                        teacher:
+                            title: PostPayload.course.teacher
+                            type: string
+                        rating:
+                            properties:
+                                sweetness:
+                                    title: PostPayload.course.rating.sweetness
+                                    type: number
+                                easiness:
+                                    title: PostPayload.course.rating.easiness
+                                    type: number
+                                usefulness:
+                                    title: PostPayload.course.rating.usefulness
+                                    type: number
+                            required:
+                                - sweetness
+                                - easiness
+                                - usefulness
+                            additionalProperties: false
+                            title: PostPayload.course.rating
+                            description: 如果 type 是 course 就必須存在，question 則不應存在
+                            type: object
+                    required:
+                        - year
+                        - term
+                        - serial
+                        - name
+                        - teacher
+                    additionalProperties: false
+                    title: PostPayload.course
+                    type: object
+            required:
+                - type
+                - title
+                - content
+                - tags
+            additionalProperties: false
+            title: PostPayload
+            type: object
+        PostResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    $ref: "#/components/schemas/Post"
+                    title: PostResponse.data
+            additionalProperties: false
+            title: PostResponse
+            type: object
+        PostsResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    items:
+                        $ref: "#/components/schemas/PostMeta"
+                        title: PostsResponse.data.[]
+                    title: PostsResponse.data
+                    type: array
+            additionalProperties: false
+            title: PostsResponse
+            type: object
+        CommentSuccessResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    properties:
+                        id:
+                            title: CommentSuccessResponse.data.id
+                            description: 留言 ID
+                            type: string
+                        url:
+                            title: CommentSuccessResponse.data.url
+                            description: 貼文 URL
+                            type: string
+                    required:
+                        - id
+                        - url
+                    additionalProperties: false
+                    title: CommentSuccessResponse.data
+                    description: 成功留言
+                    type: object
+            additionalProperties: false
+            title: CommentSuccessResponse
+            type: object
+        PostSuccessResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    properties:
+                        id:
+                            title: PostSuccessResponse.data.id
+                            description: 貼文 ID
+                            type: string
+                        url:
+                            title: PostSuccessResponse.data.url
+                            description: 貼文 URL
+                            type: string
+                    required:
+                        - id
+                        - url
+                    additionalProperties: false
+                    title: PostSuccessResponse.data
+                    description: 成功貼文
+                    type: object
+            additionalProperties: false
+            title: PostSuccessResponse
+            type: object
+        ComplexPostSearch:
+            properties:
+                q:
+                    $ref: "#/components/schemas/ComplexPostSearchString"
+                    title: ComplexPostSearch.q
+            required:
+                - q
+            additionalProperties: false
+            title: ComplexPostSearch
+            type: object
+        CourseTag:
+            properties:
+                name:
+                    title: CourseTag.name
+                    description: Tag 名稱
+                    type: string
+                weight:
+                    title: CourseTag.weight
+                    description: 相關性權重
+                    type: number
+                color:
+                    title: CourseTag.color
+                    description: Tag 顏色
+                    type: string
+            required:
+                - name
+                - weight
+                - color
+            additionalProperties: false
+            title: CourseTag
+            type: object
+        CourseQuota:
+            properties:
+                limit:
+                    title: CourseQuota.limit
+                    description: 一般名額
+                    type: number
+                additional:
+                    title: CourseQuota.additional
+                    description: 授權碼名額
+                    type: number
+            required:
+                - limit
+                - additional
+            additionalProperties: false
+            title: CourseQuota
+            type: object
+        CourseTime:
+            properties:
+                day:
+                    title: CourseTime.day
+                    description: 星期幾 1 ~ 7, -1 表示密集課程, 0 表示處理失敗
+                    type: number
+                from:
+                    title: CourseTime.from
+                    description: "第幾節開始 11 ~ 14: A ~ D"
+                    type: number
+                to:
+                    title: CourseTime.to
+                    description: "第幾節結束 11 ~ 14: A ~ D"
+                    type: number
+            required:
+                - day
+                - from
+                - to
+            additionalProperties: false
+            title: CourseTime
+            type: object
+        CourseLocation:
+            properties:
+                campus:
+                    title: CourseLocation.campus
+                    description: 校區
+                    type: string
+                classroom:
+                    title: CourseLocation.classroom
+                    description: 教室
+                    type: string
+            required:
+                - campus
+                - classroom
+            additionalProperties: false
+            title: CourseLocation
+            type: object
+        CourseMeta:
+            properties:
+                year:
+                    title: CourseMeta.year
+                    description: 開課學年度
+                    type: number
+                term:
+                    title: CourseMeta.term
+                    description: 開課學期
+                    type: number
+                name:
+                    title: CourseMeta.name
+                    description: 課程名稱
+                    type: string
+                teachers:
+                    items:
+                        title: CourseMeta.teachers.[]
+                        type: string
+                    title: CourseMeta.teachers
+                    description: 授課教師
+                    type: array
+                department:
+                    title: CourseMeta.department
+                    description: 開課系所
+                    type: string
+                credit:
+                    title: CourseMeta.credit
+                    description: 學分數
+                    type: number
+                code:
+                    title: CourseMeta.code
+                    description: 科目代碼
+                    type: string
+                serial:
+                    title: CourseMeta.serial
+                    description: 開課序號，純數字的那個
+                    type: number
+                group:
+                    title: CourseMeta.group
+                    description: 課程組別
+                    type: string
+                schedule:
+                    items:
+                        allOf:
+                            - $ref: "#/components/schemas/CourseTime"
+                            - $ref: "#/components/schemas/CourseLocation"
+                    title: CourseMeta.schedule
+                    description: 時間地點
+                    type: array
+                programs:
+                    items:
+                        title: CourseMeta.programs.[]
+                        type: string
+                    title: CourseMeta.programs
+                    description: 學分學程
+                    type: array
+                tags:
+                    items:
+                        $ref: "#/components/schemas/CourseTag"
+                        title: CourseMeta.tags.[]
+                    title: CourseMeta.tags
+                    description: 標籤
+                    type: array
+                featured:
+                    title: CourseMeta.featured
+                    description: 精選課程？可能有贊助？
+                    type: boolean
+            required:
+                - year
+                - term
+                - name
+                - teachers
+                - department
+                - credit
+                - code
+                - serial
+                - group
+                - schedule
+                - programs
+                - tags
+                - featured
+            additionalProperties: false
+            title: CourseMeta
+            type: object
+        CourseMetaResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    items:
+                        $ref: "#/components/schemas/CourseMeta"
+                        title: CourseMetaResponse.data.[]
+                    title: CourseMetaResponse.data
+                    description: 成功，課程 Metadata 列表
+                    type: array
+            additionalProperties: false
+            title: CourseMetaResponse
+            type: object
+        CourseLecturingMethodology:
+            properties:
+                type:
+                    title: CourseLecturingMethodology.type
+                    description: 授課種類
+                    type: string
+                note:
+                    title: CourseLecturingMethodology.note
+                    description: 教師填的詳細內容
+                    type: string
+            required:
+                - type
+                - note
+            additionalProperties: false
+            title: CourseLecturingMethodology
+            type: object
+        CourseGradingPolicy:
+            properties:
+                type:
+                    title: CourseGradingPolicy.type
+                    description: 評分種類
+                    type: string
+                weight:
+                    title: CourseGradingPolicy.weight
+                    description: 評分比重 0 ~ 100
+                    type: number
+                note:
+                    title: CourseGradingPolicy.note
+                    description: 教師填的詳細內容
+                    type: string
+            required:
+                - type
+                - weight
+                - note
+            additionalProperties: false
+            title: CourseGradingPolicy
+            type: object
+        CourseRating:
+            properties:
+                sweetness:
+                    title: CourseRating.sweetness
+                    description: 甜度評分 Stars
+                    type: number
+                easiness:
+                    title: CourseRating.easiness
+                    description: 涼度評分 Stars
+                    type: number
+                usefulness:
+                    title: CourseRating.usefulness
+                    description: 實用度評分 Stars
+                    type: number
+            required:
+                - sweetness
+                - easiness
+                - usefulness
+            additionalProperties: false
+            title: CourseRating
+            type: object
+        CourseReview:
+            properties:
+                content:
+                    title: CourseReview.content
+                    description: 評論內容
+                    type: string
+                time:
+                    title: CourseReview.time
+                    description: 評論時間
+                    type: string
+                user:
+                    title: CourseReview.user
+                    description: 評論者 Primary Key
+                    type: string
+                rating:
+                    $ref: "#/components/schemas/CourseRating"
+                    title: CourseReview.rating
+                    description: 量化評論
+            required:
+                - content
+                - time
+                - user
+                - rating
+            additionalProperties: false
+            title: CourseReview
+            type: object
+        CourseInfo:
+            properties:
+                year:
+                    title: CourseInfo.year
+                    description: 開課學年度
+                    type: number
+                term:
+                    title: CourseInfo.term
+                    description: 開課學期
+                    type: number
+                name:
+                    title: CourseInfo.name
+                    description: 課程名稱
+                    type: string
+                teachers:
+                    items:
+                        title: CourseInfo.teachers.[]
+                        type: string
+                    title: CourseInfo.teachers
+                    description: 授課教師
+                    type: array
+                department:
+                    title: CourseInfo.department
+                    description: 開課系所
+                    type: string
+                credit:
+                    title: CourseInfo.credit
+                    description: 學分數
+                    type: number
+                code:
+                    title: CourseInfo.code
+                    description: 科目代碼
+                    type: string
+                serial:
+                    title: CourseInfo.serial
+                    description: 開課序號
+                    type: number
+                group:
+                    title: CourseInfo.group
+                    description: 課程組別
+                    type: string
+                quota:
+                    $ref: "#/components/schemas/CourseQuota"
+                    title: CourseInfo.quota
+                    description: 名額
+                schedule:
+                    items:
+                        allOf:
+                            - $ref: "#/components/schemas/CourseTime"
+                            - $ref: "#/components/schemas/CourseLocation"
+                    title: CourseInfo.schedule
+                    description: 時間地點
+                    type: array
+                programs:
+                    items:
+                        title: CourseInfo.programs.[]
+                        type: string
+                    title: CourseInfo.programs
+                    description: 學分學程
+                    type: array
+                featured:
+                    title: CourseInfo.featured
+                    description: 精選課程？可能有贊助？
+                    type: boolean
+                tags:
+                    items:
+                        $ref: "#/components/schemas/CourseTag"
+                        title: CourseInfo.tags.[]
+                    title: CourseInfo.tags
+                    description: 標籤
+                    type: array
+                description:
+                    title: CourseInfo.description
+                    description: 課程簡介
+                    type: string
+                hours:
+                    title: CourseInfo.hours
+                    description: 實際每週授課時數
+                    type: number
+                goals:
+                    items:
+                        title: CourseInfo.goals.[]
+                        type: string
+                    title: CourseInfo.goals
+                    description: 課程目標
+                    type: array
+                syllabus:
+                    title: CourseInfo.syllabus
+                    description: 教學大綱
+                    type: string
+                methodologies:
+                    items:
+                        $ref: "#/components/schemas/CourseLecturingMethodology"
+                        title: CourseInfo.methodologies.[]
+                    title: CourseInfo.methodologies
+                    description: 教學方法
+                    type: array
+                grading:
+                    items:
+                        $ref: "#/components/schemas/CourseGradingPolicy"
+                        title: CourseInfo.grading.[]
+                    title: CourseInfo.grading
+                    description: 評分方法
+                    type: array
+                prerequisite:
+                    title: CourseInfo.prerequisite
+                    description: 先修課程
+                    type: string
+                general_core:
+                    items:
+                        title: CourseInfo.general_core.[]
+                        type: string
+                    title: CourseInfo.general_core
+                    description: 通識領域
+                    type: array
+                rating:
+                    allOf:
+                        - $ref: "#/components/schemas/CourseRating"
+                        - properties:
+                              count:
+                                  title: count
+                                  description: 評分人數
+                                  type: number
+                          required:
+                              - count
+                          additionalProperties: false
+                          type: object
+                    title: CourseInfo.rating
+                    description: 評分數據
+                comment:
+                    title: CourseInfo.comment
+                    description: 備註
+                    type: string
+                restrict:
+                    title: CourseInfo.restrict
+                    description: 修課限制
+                    type: string
+                reviews:
+                    items:
+                        $ref: "#/components/schemas/CourseReview"
+                        title: CourseInfo.reviews.[]
+                    title: CourseInfo.reviews
+                    description: 課程評論，最近的 5 筆
+                    type: array
+            required:
+                - year
+                - term
+                - name
+                - teachers
+                - department
+                - credit
+                - code
+                - serial
+                - group
+                - quota
+                - schedule
+                - programs
+                - featured
+                - tags
+                - description
+                - hours
+                - goals
+                - syllabus
+                - methodologies
+                - grading
+                - prerequisite
+                - general_core
+                - rating
+                - comment
+                - restrict
+                - reviews
+            additionalProperties: false
+            title: CourseInfo
+            type: object
+        CourseInfoResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    $ref: "#/components/schemas/CourseInfo"
+                    title: CourseInfoResponse.data
+                    description: 成功
+            additionalProperties: false
+            title: CourseInfoResponse
+            type: object
+        CourseTagsResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    items:
+                        $ref: "#/components/schemas/CourseTag"
+                        title: CourseTagsResponse.data.[]
+                    title: CourseTagsResponse.data
+                    description: Tags
+                    type: array
+            additionalProperties: false
+            title: CourseTagsResponse
+            type: object
+        ComplexCourseSearch:
+            properties:
+                q:
+                    $ref: "#/components/schemas/ComplexCourseSearchString"
+                    title: ComplexCourseSearch.q
+            required:
+                - q
+            additionalProperties: false
+            title: ComplexCourseSearch
+            type: object
+        Me:
+            properties:
+                username:
+                    $ref: "#/components/schemas/Username"
+                    title: Me.username
+                display:
+                    title: Me.display
+                    type: string
+                email:
+                    title: Me.email
+                    type: string
+                std_id:
+                    $ref: "#/components/schemas/StdId"
+                    title: Me.std_id
+                avatar:
+                    title: Me.avatar
+                    type: string
+                verified:
+                    title: Me.verified
+                    type: boolean
+                exp:
+                    title: Me.exp
+                    type: number
+                badges:
+                    items:
+                        $ref: "#/components/schemas/Badge"
+                        title: Me.badges.[]
+                    title: Me.badges
+                    type: array
+                perm:
+                    items:
+                        $ref: "#/components/schemas/Permission"
+                        title: Me.perm.[]
+                    title: Me.perm
+                    type: array
+            required:
+                - username
+                - display
+                - email
+                - std_id
+                - avatar
+                - verified
+                - exp
+                - badges
+                - perm
+            additionalProperties: false
+            title: Me
+            type: object
+        MeResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    $ref: "#/components/schemas/Me"
+                    title: MeResponse.data
+                    description: 成功
+            additionalProperties: false
+            title: MeResponse
+            type: object
+        MePatch:
+            properties:
+                display:
+                    title: MePatch.display
+                    type: string
+                avatar:
+                    title: MePatch.avatar
+                    type: string
+                username:
+                    $ref: "#/components/schemas/Username"
+                    title: MePatch.username
+                password:
+                    title: MePatch.password
+                    type: string
+                email:
+                    title: MePatch.email
+                    type: string
+                std_id:
+                    $ref: "#/components/schemas/StdId"
+                    title: MePatch.std_id
+                old_password:
+                    title: MePatch.old_password
+                    type: string
+            additionalProperties: false
+            title: MePatch
+            type: object
+        Course:
+            properties:
+                name:
+                    title: Course.name
+                    type: string
+                teacher:
+                    title: Course.teacher
+                    type: string
+                year:
+                    title: Course.year
+                    type: number
+                term:
+                    title: Course.term
+                    type: number
+                serial:
+                    title: Course.serial
+                    type: number
+            required:
+                - name
+                - teacher
+                - year
+                - term
+                - serial
+            additionalProperties: false
+            title: Course
+            type: object
+        Profile:
+            properties:
+                username:
+                    $ref: "#/components/schemas/Username"
+                    title: Profile.username
+                display:
+                    title: Profile.display
+                    type: string
+                school:
+                    title: Profile.school
+                    type: string
+                department:
+                    title: Profile.department
+                    type: string
+                avatar:
+                    title: Profile.avatar
+                    type: string
+                verified:
+                    title: Profile.verified
+                    type: boolean
+                exp:
+                    title: Profile.exp
+                    type: number
+                badges:
+                    items:
+                        $ref: "#/components/schemas/Badge"
+                        title: Profile.badges.[]
+                    title: Profile.badges
+                    type: array
+                perm:
+                    items:
+                        $ref: "#/components/schemas/Permission"
+                        title: Profile.perm.[]
+                    title: Profile.perm
+                    type: array
+                courses:
+                    items:
+                        $ref: "#/components/schemas/Course"
+                        title: Profile.courses.[]
+                    title: Profile.courses
+                    type: array
+            required:
+                - username
+                - display
+                - school
+                - department
+                - avatar
+                - verified
+                - exp
+                - badges
+                - perm
+                - courses
+            additionalProperties: false
+            title: Profile
+            type: object
+        ProfileResponse:
+            allOf:
+                - $ref: "#/components/schemas/Response"
+            properties:
+                data:
+                    $ref: "#/components/schemas/Profile"
+                    title: ProfileResponse.data
+                    description: 成功
+            additionalProperties: false
+            title: ProfileResponse
+            type: object
+        Username:
+            title: Username
+            description: 使用者 ID
+            type: string
+        StdId:
+            title: StdId
+            description: 使用者學校-使用者學號 @example `001-41047000S`
+            type: string
+        ComplexPostSearchString:
+            title: ComplexPostSearchString
+            description: >-
+                以空白分割多個 filter，進行 AND 查詢（OR 查詢可視情況由後端擴充）
+
+                每個 filter 的形式為 `key:value`，或者，也可以沒有 `key` 只有 `value`
+                做模糊搜尋（或預設搜尋標題跟科目代碼之類的？）
+
+
+                例如：
+
+                `考古題 date:>2021` 代表要搜尋任何包含「考古題」且在 2021 年之後的貼文
+
+
+                建議 filters，這部分是後端可自行決定:
+
+                - title (t) 貼文標題 `t:考古題`
+
+                - code (c) 相關課程科目代碼 `c:CSU0002`
+
+                - tag (tg) 標籤 `tg:考古題`
+
+                - program (p) 學分學程 `p:音樂科技`
+
+                - date (d) 發文時間 `d:>2021`
+
+                - vote (v) 正向投票數 `v:>100`
+
+                - author (a) 發文者 `a:user123`
+            type: string
+        ComplexCourseSearchString:
+            title: ComplexCourseSearchString
+            description: >-
+                以空白分割多個 filter，進行 AND 查詢（OR 查詢可視情況由後端擴充）
+
+                每個 filter 的形式為 `key:value`，或者，也可以沒有 `key` 只有 `value`
+                做模糊搜尋（或預設搜尋標題跟科目代碼之類的？）
+
+
+                例如：
+
+                `程式設計 department:資工系 teacher:紀` 代表要搜尋任何包含「程式設計」且教師有「紀」的「資工系」課程
+
+
+                建議 filters，這部分是後端可自行決定:
+
+                - department (d) 系所 `d:資工`
+
+                - teacher (T) 教師 `T:紀`
+
+                - title (t) 課程名稱 `t:程式設計`
+
+                - code (c) 科目代碼 `c:CSU0002`
+
+                - serial (s) 開課序號 `s:2949`
+
+                - year (y) 開課學年度 `y:110`（或者要合併學期 `110-2` 或 `1102`）
+
+                - term (tm) 開課學期 `tm:2`
+
+                - tag (tg) 標籤 `tg:UX`
+
+                - program (p) 學分學程 `p:音樂科技`
+
+                - general (g) 通識領域 `g:人文`
+
+                - rating (r) 綜合評分 `r:>4.5` （`>` `<` `=`）
+
+                - usefulness (uf) 實用性 `u:>4`
+
+                - sweetness (sw) 甜度 `s:>4`
+
+                - easiness (es) 涼度 `e:>4`
+
+                - day (d) 週幾授課 `d:1` (考慮與節數時段合併？)
+
+                - session (sn) 包含的節數時段 `sn:1-2` `sn:5`
+
+                - location (l) 地點 `l:公館`
+
+                - quota (q) 名額 `q:>10`
+
+                - grading (gd) 評分方法 `gd:作業>49`
+
+                - hours (h) 實際每週授課時數 `h:<3`
+
+                - methodology (m) 教學方法包含 `m:講述法`
+
+                - prerequisite (pr) 先修課程 `pr:程式設計（一）`
+            type: string
