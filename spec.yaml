@@ -162,7 +162,7 @@ paths:
             parameters:
                 - in: path
                   name: username
-                  description: 使用者 ID
+                  description: 使用者 Username
                   required: true
                   schema:
                       type: string
@@ -706,7 +706,8 @@ components:
                     type: boolean
                 data:
                     title: Response.data
-                    description: 成功
+                    description: 資料，如果有
+                    type: object
                 err:
                     properties:
                         title:
@@ -764,10 +765,14 @@ components:
             properties:
                 user:
                     properties:
-                        name:
-                            $ref: "#/components/schemas/Username"
-                            title: JWTPayload.user.name
+                        id:
+                            title: JWTPayload.user.id
                             description: 使用者 ID
+                            type: number
+                        username:
+                            $ref: "#/components/schemas/Username"
+                            title: JWTPayload.user.username
+                            description: 使用者 Username
                         email:
                             title: JWTPayload.user.email
                             description: 使用者 Email
@@ -780,28 +785,24 @@ components:
                             title: JWTPayload.user.exp
                             description: 使用者經驗值
                             type: number
-                        perm:
+                        perms:
                             items:
-                                title: JWTPayload.user.perm.[]
+                                title: JWTPayload.user.perms.[]
                                 type: string
-                            title: JWTPayload.user.perm
+                            title: JWTPayload.user.perms
                             description: 使用者特殊權限 @example `["admin", "moderator"]`
                             type: array
-                        std_id:
-                            $ref: "#/components/schemas/StdId"
-                            title: JWTPayload.user.std_id
-                            description: 使用者學校-使用者學號
                         verified:
                             title: JWTPayload.user.verified
                             description: 是否通過學校驗證
                             type: boolean
                     required:
-                        - name
+                        - id
+                        - username
                         - email
                         - display
                         - exp
-                        - perm
-                        - std_id
+                        - perms
                         - verified
                     additionalProperties: false
                     title: JWTPayload.user
@@ -816,7 +817,7 @@ components:
                     type: number
                 id:
                     title: JWTPayload.id
-                    description: JWT ID，隨機字串，應該是後端比較需要用？
+                    description: JWT ID，隨機字串
                     type: string
             required:
                 - user
@@ -830,7 +831,7 @@ components:
             properties:
                 username:
                     title: LoginPayload.username
-                    description: 使用者 ID
+                    description: 使用者 Username
                     type: string
                 password:
                     title: LoginPayload.password
@@ -851,7 +852,7 @@ components:
             properties:
                 username:
                     title: RegisterPayload.username
-                    description: 使用者 ID
+                    description: 使用者 Username
                     type: string
                 password:
                     title: RegisterPayload.password
@@ -861,10 +862,6 @@ components:
                     title: RegisterPayload.email
                     description: 使用者電子郵件
                     type: string
-                std_id:
-                    title: RegisterPayload.std_id
-                    description: 使用者學校-使用者學號 @example `001-41047000S`
-                    type: string
                 recaptcha:
                     title: RegisterPayload.recaptcha
                     description: reCAPTCHA 的那個 code
@@ -873,7 +870,6 @@ components:
                 - username
                 - password
                 - email
-                - std_id
                 - recaptcha
             additionalProperties: false
             title: RegisterPayload
@@ -881,19 +877,6 @@ components:
         AuthResponse:
             allOf:
                 - $ref: "#/components/schemas/Response"
-            properties:
-                data:
-                    properties:
-                        token:
-                            title: AuthResponse.data.token
-                            description: JWT
-                            type: string
-                    required:
-                        - token
-                    additionalProperties: false
-                    title: AuthResponse.data
-                    description: 成功
-                    type: object
             additionalProperties: false
             title: AuthResponse
             type: object
@@ -1864,9 +1847,6 @@ components:
                 email:
                     title: Me.email
                     type: string
-                std_id:
-                    $ref: "#/components/schemas/StdId"
-                    title: Me.std_id
                 avatar:
                     title: Me.avatar
                     type: string
@@ -1892,7 +1872,6 @@ components:
                 - username
                 - display
                 - email
-                - std_id
                 - avatar
                 - verified
                 - exp
@@ -1929,9 +1908,6 @@ components:
                 email:
                     title: MePatch.email
                     type: string
-                std_id:
-                    $ref: "#/components/schemas/StdId"
-                    title: MePatch.std_id
                 old_password:
                     title: MePatch.old_password
                     type: string
@@ -2032,7 +2008,7 @@ components:
             type: object
         Username:
             title: Username
-            description: 使用者 ID
+            description: 使用者 Username
             type: string
         StdId:
             title: StdId
