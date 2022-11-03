@@ -752,12 +752,8 @@ components:
                 name:
                     title: Permission.name
                     type: string
-                description:
-                    title: Permission.description
-                    type: string
             required:
                 - name
-                - description
             additionalProperties: false
             title: Permission
             type: object
@@ -1862,11 +1858,11 @@ components:
                         title: Me.badges.[]
                     title: Me.badges
                     type: array
-                perm:
+                perms:
                     items:
                         $ref: "#/components/schemas/Permission"
-                        title: Me.perm.[]
-                    title: Me.perm
+                        title: Me.perms.[]
+                    title: Me.perms
                     type: array
             required:
                 - username
@@ -1876,7 +1872,7 @@ components:
                 - verified
                 - exp
                 - badges
-                - perm
+                - perms
             additionalProperties: false
             title: Me
             type: object
@@ -1969,11 +1965,11 @@ components:
                         title: Profile.badges.[]
                     title: Profile.badges
                     type: array
-                perm:
+                perms:
                     items:
                         $ref: "#/components/schemas/Permission"
-                        title: Profile.perm.[]
-                    title: Profile.perm
+                        title: Profile.perms.[]
+                    title: Profile.perms
                     type: array
                 courses:
                     items:
@@ -1990,7 +1986,7 @@ components:
                 - verified
                 - exp
                 - badges
-                - perm
+                - perms
                 - courses
             additionalProperties: false
             title: Profile
